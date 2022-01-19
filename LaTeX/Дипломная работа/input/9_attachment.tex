@@ -1,0 +1,36 @@
+\phantomsection
+\addcontentsline{toc}{section}{Приложения}
+\section*{Приложения}
+\noindent\textbf{Реализация регуляризованного экстраградиентного метода на Си++ для модельных примеров.}
+\begin{lstlisting}[caption={Реализация метода на Си++}]
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+const int N = 5000;
+const float v_start = 1.0;
+const float eps = 0.01;
+
+float gradPsiError(float v, float w, float delta) { return v + delta*w;}
+\\ For the second example: { return 2*w*v + delta*w;}
+float gradPError(float w, float delta){ return (w<=-1)? -1.0 + delta: ((w>=1)? 1.0+delta: delta);}
+
+int main()
+{
+	int k = 1;
+	float v = v_start;
+	while(k <= N){
+		float alpha = 1.0/(k+1);
+		float A = k+1;
+		float delta = 1.0/(k+1);
+		float beta = 1.0/(2+2*A);
+		float u = v - beta * (gradPsiError(v, v, delta) + A * gradPError(v, delta));
+		float v = v - beta * ( gradPsiError(v, u, delta) + A * gradPError(u, delta) - 2*alpha*(u-v));
+		k++;
+		cout << "k=" << k << " v=" << v << endl;
+	}
+	return 0;
+}
+
+\end{lstlisting}

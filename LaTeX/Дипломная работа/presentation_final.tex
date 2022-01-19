@@ -1,0 +1,353 @@
+%%%%%%%%%%%%%%%% что - то про dvips
+% latex yourfile.tex
+% dvips yourfile.dvi
+% ps2pdf yourfile.ps
+
+%aspectratio=169
+\documentclass[unicode, t, 11pt]{beamer}% [t], [c], или [b] --- вертикальное выравнивание на слайдах (верх, центр, низ)
+%\documentclass[aspectratio=169]{beamer} % Соотношение сторон
+
+%%% Работа с русским языком
+\usepackage{cmap}					% поиск в PDF
+\usepackage{mathtext} 				% русские буквы в формулах
+% \usepackage[T2A]{fontenc}			% кодировка
+\usepackage[T1, T2A]{fontenc}
+\usepackage[utf8]{inputenc}			% кодировка исходного текста
+\usepackage[english,russian]{babel}	% локализация и переносы
+\usepackage{bm}
+
+% %% Beamer по-русски
+% \newtheorem{rtheorem}{Теорема}
+% \newtheorem{rproof}{Доказательство}
+% \newtheorem{rexample}{Пример}
+\usepackage{amsmath, amsfonts, amssymb, amsthm, mathtools} % AMS
+\usepackage{icomma} % "Умная" запятая: $0,2$ --- число, $0, 2$ --- перечисление
+
+%% Номера формул
+%\mathtoolsset{showonlyrefs=true} % Показывать номера только у тех формул, на которые есть \eqref{} в тексте.
+%\usepackage{leqno} % Нумерация формул слева
+
+%%% Работа с картинками
+\usepackage{graphicx}  % Для вставки рисунков
+%\graphicspath{{presentation/images/}}  % папки с картинками
+\setlength\fboxsep{3pt} % Отступ рамки \fbox{} от рисунка
+\setlength\fboxrule{1pt} % Толщина линий рамки \fbox{}
+\usepackage{wrapfig} % Обтекание рисунков текстом
+
+%%% Работа с таблицами
+\usepackage{array,tabularx,tabulary,booktabs} % Дополнительная работа с таблицами
+\usepackage{longtable}  % Длинные таблицы
+\usepackage{multirow} % Слияние строк в таблице
+
+%%% Программирование
+\usepackage{etoolbox} % логические операторы
+
+%%% Другие пакеты
+\usepackage{lastpage} % Узнать, сколько всего страниц в документе.
+\usepackage{soul} % Модификаторы начертания
+\usepackage{csquotes} % Еще инструменты для ссылок
+%\usepackage[style=authoryear,maxcitenames=2,backend=biber,sorting=nty]{biblatex}
+\usepackage{multicol} % Несколько колонок
+
+%%% Картинки
+\usepackage{tikz} % Работа с графикой
+% \usepackage{pgfplots}
+% \usepackage{pgfplotstable}
+
+\usepackage{enumerate}
+\usepackage{enumitem}
+\setlist[itemize]{noitemsep, topsep=0pt}
+
+\usepackage{caption}
+\DeclareCaptionFont{tiny}{\tiny}
+\captionsetup{belowskip=0pt}
+\setlength{\belowcaptionskip}{-10pt}
+
+\newlength{\mylen}
+
+\usepackage{tabularx}
+
+%\usefonttheme{professionalfonts} % using non standard fonts for beamer
+\usefonttheme{serif} % default family is serif
+
+\setbeamertemplate{footline}[frame number]
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{
+	{
+	\footnotesize\color{black}Московский государственный университет имени М.В.\,Ломоносова\\
+	Университет МГУ-ППИ в Шэньчжэне\\
+    Факультет вычислительной математики и кибернетики\\}
+    \vspace{\baselineskip}
+    {\LARGE Регуляризующие алгоритмы в неустойчивых равновесных задачах}
+}
+\subtitle{Выпускная квалификационная работа}
+\author{\footnotesize Студент: Сюй Минчуань\\
+		Научный руководитель: к.ф-м.н., доцент ВМК МГУ\\
+		Будак Борис Александрович}
+
+\date{\includegraphics[height=0.8cm]{./images/MSU}\\
+	  \scriptsize
+	  Шэньчжэнь\\
+	  7 июня 2021 г.}
+%\logo{\includegraphics[height=1.5cm]{./images/MSU}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+	\frame[plain]{\titlepage}  % Титульный слайд
+	\section{Кратое введение о равновесном программировании}
+		\begin{frame}
+			\frametitle{\insertsection}
+			Рассматривается задача \textbf{равновесного программирования}: найти точку $v_*$ из условий 
+			\begin{equation}\label{1}
+			\begin{aligned}
+			&v_*\in \mathbf{W}\subseteq \mathbb{R}^n,\quad \Phi(v_*,v_*)\leqslant\Phi(v_*,w),\quad w\in \mathbf{W},\\
+			&\mathbf{W}=\{w\in \mathbf{W_0}:g_i(w)\leqslant 0,i=\overline{1,m},g_i(w)=0,i=\overline{m+1,s} \},
+			\end{aligned}
+			\end{equation}
+			где $\mathbf{W_0}$ - множество из $\mathbb{R}^n$ (обычно имеет простой вид, возможно $\mathbf{W_{0}}=\mathbb{R}^n$).\\[5mm]
+			\textbf{Типичные равновесные задачи:}
+			\begin{itemize}
+				\item Задача математического программирования.
+				\item Задача поиска седловых точек.
+				\item Задача поиска равновесия по Нэшу.
+			\end{itemize}
+		\end{frame}
+	\section{Существующие методы к решению равновесной задачи}
+		\begin{frame}
+			\frametitle{\insertsection}
+					\begin{itemize}[label=\(\bullet\)]
+						\item \textbf{Градиентный метод прогнозного типа.}\\
+						Применяется в случае $\mathbf{W}=\mathbb{R}^n$.\\
+						Схема метода: начальное приближение $v_0\in \mathbf{W}$ - задано;\\
+						\begin{equation*}
+						\left\{\begin{array}{l}
+						u_k=v_k-\alpha_k \nabla_w\Phi(v_k,v_k),\\
+						v_{k+1}=v_k-\alpha_k\nabla_w\Phi(u_k,u_k),
+						\end{array}\right.
+						\end{equation*}
+						где $k=0,1,2,\ldots,$ параметры $\alpha_k>0$.
+						\item Экстраградиентный метод
+						\item Метод линеаризации
+						\item Проксимальный метод
+						\item Непрерывные варианты методов
+						\item Метод стрельбы
+						\item \ldots
+					\end{itemize}
+				Перечислимые выше методы уже хорошо изучены. Отметим, что проблема \textbf{неустойчивости} задачи существенна, для которой требуются изменения в методах.
+	\end{frame}
+			
+	\section{Неустойчивость к возмущению данных}
+	\begin{frame}
+	\frametitle{\insertsection}
+	Допустим, что 
+	\begin{equation}
+	\label{2}
+	\begin{aligned}
+	&\lim\limits_{\delta\to 0} \left|\Phi^{\delta}(v,w)-\Phi(v,w)\right|=0;\\
+	&\lim\limits_{\delta\to 0} \left\|\nabla_w^{\delta}\Phi(v,w)-\nabla_w\Phi(v,w)\right\|=0.
+	\end{aligned}
+	\end{equation}
+	Однако подход к использованию метода с приближенными данными из \eqref{2} не всегда дает возможность получить приближенное решение задачи. \\[15mm]
+	
+	Исследования данной тематики могут найти в работах Антипин А.С., Васильев Ф.П., Шпирко С.В., Будак Б.А. и др.
+	
+	\end{frame}
+
+\section{Основные методы регуляризации}
+\begin{frame}
+\frametitle{\insertsection}
+\begin{itemize}[label=\(\bullet\)]
+	\item\textbf{Метод стабилизации:} Введем функцию Тихонова: $t_{\delta} (v,w)=\Phi_{\delta}(v,w)+\alpha \Omega(w),\quad w\in \mathbf{W_0},\,\alpha>0$.\\
+	Будем искать точку, удовлетворяющую условиям
+	$v_{\delta}\in \mathbf{W_0},\quad t_{\delta}(v_\delta,v_\delta)\leqslant t_{\delta}(v_{\delta},w)+\varepsilon,\forall w\in\mathbf{W_0},\varepsilon>0.$\\
+	Точки, выполняющие данные условия, сходятся к исходному решению при подобном выборе параметров.\\
+	\emph{Сочетание с штрафной функцией:}\\
+	Вместо сложного множества $\mathbf{W}$ работаем на более простом множестве $\mathbf{W_0}$ (возможно $\mathbf{W_0}=\mathbb{R}^n$), добавив штрафное слагаемое $AP_{\delta}(w)$ в тихоновскую функцию.
+	\item Метод невязки.
+	\item Метод квазирешений.
+\end{itemize}
+\end{frame}
+
+\section{Основная цель: Применение нового стабилизатора}
+\subsection{Часть 1. Метод стабилизации с новым стабилизатором $-\alpha_k\|v-w\|^2$}
+\begin{frame}
+\frametitle{\insertsection}
+\framesubtitle{\insertsubsection}
+Некоторые \textbf{предварительные} рассуждения:
+\begin{itemize}[label=\(\bullet\)]
+	\item Допустим, что для некоторой точки $v_*\in \mathbf{W_*}$ \textit{существуют} постоянные $v>0,c_i\geqslant 0$ такие, что
+\begin{equation}
+\label{7}
+\Phi(v_*,v_*)\leqslant \Phi(v_*,w)+\sum_{i=1}^{s} c_i[g_i^+(w)]^v,\quad \forall w\in\mathbf{W_0}
+\end{equation}
+	\item \emph{Достаточное условие} для непустоты $\mathbf{W}_{*\delta}$.
+	\begin{equation}
+	\label{13}
+	\begin{aligned}
+	&BA^{-v/(p-v)}+\delta\|v_*\|^2(3+A)+2(\delta+A\delta)\leqslant 1/2\varepsilon(\delta),\\ &\alpha\|v_*-w\|^2+\|w\|^2(\delta+A\delta)\leqslant 1/2 \varepsilon(\delta),\forall w\in \mathbf{W_0},\delta>0
+	\end{aligned}
+	\end{equation}
+	где $v_*\in \mathbf{W}_*$ взята из условия \eqref{7}, $B$ - константа определенного вида.
+\end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{\insertsection}
+\framesubtitle{\insertsubsection}
+Некоторые \textbf{предварительные} рассуждения:
+\begin{center}
+	\begin{itemize}[label=\(\bullet\)]
+		\item \textit{Кососимметричность} функции: $\Phi(w,w)-\Phi(w,v)-\Phi(v,w)+\Phi(v,v)\geqslant 0,\quad \forall w,v\in \mathbf{W_0}$.
+		\item Пусть приближения $\Phi_{\delta}(v,w),P_{\delta}(w)$ для функций $\Phi(v,w),P(w)$ таковы, что
+		\begin{equation}
+		\label{noise}
+		\begin{aligned}
+		&\big|\Phi_{\delta}(v,w)-\Phi(v,w)\big|\leqslant \delta\big(1+\|v\|^2+\|w\|^2\big),\quad v,w\in\mathbf{W_0},\delta >0,\\
+		&\big|P_{\delta}(w)-P(w)\big|\leqslant \delta\big(1+\|w\|^2\big),\quad w\in\mathbf{W_0},\delta >0.
+		\end{aligned}
+		\end{equation}
+	\end{itemize}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{\insertsection}
+\framesubtitle{\insertsubsection}
+\begin{block}{Результат 1: Теорема о сходимости метода стабилизации}\begin{footnotesize}
+	Пусть выполнены следующие условия\\
+	\textbf{1)} $W_0$ - замкнутое ограниченное множество, функции $g_i(w),|g_i(w)|,\Phi(w,w)$ полунепрерывны снизу на $\mathbf{W_0}$; $\Phi(v,w)$ полунепрерывна сверху по $v$ на $\mathbf{W_0}$ $\forall w\in W_0$; $\mathbf{W_*}\ne\emptyset$; для некоторой $v_*\in \mathbf{W_*}$ выполнено условие \eqref{7}; $\Phi(v,w)$ кососимметрична на $\mathbf{W_0}$;\\
+	\textbf{2)} $\Omega(v,w)=-\alpha_k\|v-w\|^2$ - \textit{стабилизатор} задачи, $P(w)$ - штрафная функция при $p\geqslant v$;\\
+	\textbf{3)} приближения $\Phi_{\delta}(v,w),P_{\delta}(w)$ функций $\Phi(v,w),P(w)$ удовлетворяют условиям \eqref{noise};\\
+	\textbf{4)} параметры $\alpha=\alpha(\delta)>0,$ $A=A(\delta)>0,$ $\varepsilon=\varepsilon(\delta)>0,\delta>0$, удовлетворяют условиям \eqref{13} и, кроме того
+	$\lim\limits_{\delta\rightarrow 0}\alpha(\delta)=0$,$\lim\limits_{\delta\rightarrow 0}A(\delta)=0$,$\lim\limits_{\delta\rightarrow 0}\varepsilon(\delta)=0,\lim\limits_{\delta\rightarrow 0} \delta A(\delta)=0,\sup\limits_{\delta>0}\frac{3\delta+\delta A(\delta)}{\alpha(\delta)}<+\infty, \sup\limits_{\delta>0}\frac{\varepsilon(\delta)}{\alpha(\delta)}<+\infty.$\\
+	\textbf{Тогда} $\mathbf{W}_{*\delta}\ne\emptyset,\,\forall\delta>0$, и $\lim\limits_{\delta\rightarrow 0}\rho(v_{\delta},\mathbf{W_*})=0,$ $\lim\limits_{\delta\rightarrow 0} \rho(\Phi(v_{\delta},v_{\delta}),\Phi_*)=0$.
+	где $\Phi_*=\{y|y=\Phi(v,v),v\in \mathbf{W_*}\}$, причем сходимость \textit{равномерная} относительно выбора $\Phi_{\delta}(v,w),P_{\delta}(w)$ и точки $v_{\delta}$ из $\mathbf{W}_{*\delta}$.
+	\end{footnotesize}
+\end{block}
+\end{frame}
+
+\subsection{Часть 2. Экстраградиентный метод с новым стабилизатором $-\alpha_k\|v-w\|^2$}
+\begin{frame}
+\frametitle{\insertsection}
+\framesubtitle{\insertsubsection}
+Было предложена
+\begin{block}{Теорема о выпуклости и замкнутости $\mathbf{W_*}$}
+	\begin{small}
+		Пусть $\mathbf{W_0}$ - выпуклое замкнутое множество из $\mathbb{E}^n$, функция $\Phi(v,w), g_i(w)$ при $i=\overline{1,m+s}$ обладают определенными особенностями. Пусть $\mathbf{W_*}\ne\emptyset$. \textbf{Тогда} $\mathbf{W_*}$ - выпукло, замкнуто и задача имеет \textit{единственное} нормальное решение.
+	\end{small}
+\end{block}
+\,\\
+Введем функцию Тихонова\\
+$T_k(v,w)=\Phi(v,w)+A_kP(w)-\alpha_k\|v-w\|^2,$ где $v,w\in \mathbf{W_0},A_k>0,\alpha_k>0,k=0,1,\ldots$.\\
+Пусть вместо точных $\nabla_w\Phi(v,w),\nabla_wP(w)$ известны приближения $\{\nabla_w^k\Phi(v,w)\},\{\nabla_w^kP(w)\}$ такие, что
+\begin{footnotesize}
+\begin{equation}
+\label{[3]-6}
+\begin{aligned}
+&\|\nabla_w^k\Phi(v,w)-\nabla_w\Phi(v,w)\|\leqslant \delta_k(1+\|v\|+\|w\|),\quad \forall v,w\in \mathbf{W_0},\\
+&\|\nabla_w^kP(w)-\nabla_wP(w)\|\leqslant \delta_k(1+\|w\|),\quad\forall w\in \mathbf{W_0},\delta_k>0,k=0,1,\ldots 
+\end{aligned}
+\end{equation}
+\end{footnotesize}
+\end{frame}
+
+\begin{frame}
+\frametitle{\insertsection}
+\framesubtitle{\insertsubsection}
+\begin{block}{Результат 2: ``Промежуточная'' теорема}
+	\begin{small}
+		Пусть выпольнены условия предыдущей теоремы; $\nabla_w\Phi(v,w),\nabla_wg_i(w)$ на $\mathbf{W_0}$, функции $T_k(v,w)$ - выпуклы, выполнено условие \eqref{7}($v_*$ - нормальное решение); параметры удовлетворяют: $p\geqslant v$,$p>1$,$\alpha_k>0$,$A_k>0$,$\alpha_k\to 0$, и $A_k\to +\infty$,$\alpha_kA^{v/(p-v)}_k\to +\infty$. \textbf{Тогда} $z_k$, являющиеся \textit{точками равновесия} функции Тихонова, существуют однозначно $\forall k$, и
+	\begin{equation*}
+	\begin{aligned}
+	&\bm{\lim\limits_{k\to \infty}\|z_k-v_*\|=0},\lim\limits_{k\to \infty}A_kP(z_k)=0,\|z_k\|\leqslant R_k\leqslant\sup\limits_{k\geqslant 0}R_k=R,\\
+	& \|z_k-z_m\|\leqslant \frac{|A_m-A_k|R_1}{2\alpha_k},\forall k,m=0,1,..., R_1,R_2,... - \text{ постоянные.}
+	\end{aligned}
+	\end{equation*}  
+	\end{small}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{\insertsection}
+\framesubtitle{\insertsubsection}
+Предлагаемый в данной работе \textbf{регуляризующий экстраградиентный метод}:\\[5mm]
+
+	$u_k=\mathrm{Pr}_{\mathbf{W_0}}(v_k-\beta_k[\nabla_w^k\Phi(v_k,v_k)+A_k\nabla_w^kP(v_k)])$,\\
+	$v_{k+1}=\mathrm{Pr}_{\mathbf{W_0}}(v_k-\beta_k[\nabla_w^k\Phi(v_k,u_k)+A_k\nabla_w^kP(u_k)-2\alpha_k(v_k-u_k)])$\\[10mm]
+
+Пусть для параметров выполнены условия:
+\begin{equation}
+\label{[3]-30}
+\begin{aligned}
+&\alpha_k >0,A_{k+1}\geqslant A_k>0,\beta_k>0,\delta_k>0,\lim_{k\to \infty}\beta_k=0,\lim_{k\to\infty}\delta_k=0,\\
+&\sup_{k\geqslant 0}\beta_k(1+A_k)<\frac{1}{L},\lim_{k\to\infty}\frac{\delta_k+\delta_kA_k}{\alpha_k}=0,\lim_{k\to \infty}\frac{A_{k+1}-A_k}{\alpha_k^2\beta_k}=0.
+\end{aligned}
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{\insertsection}
+\framesubtitle{\insertsubsection}
+\begin{block}{Результат 3: Сходимость регуляризованного метода}
+	\begin{small}
+	
+	Пусть выполнены все условия предыдущей теоремы, и пусть $\nabla_w\Phi(v,w),\nabla_wP(w)$ удовлетворяют условию Липлища. Пусть также выполнено модифицированное условие Липшица вида:
+	\begin{equation}
+	\label{[3]-29-2}
+	\|\nabla_w\Phi(v,w)-\nabla_w\Phi(w,w)\|\leqslant L\|v-w\|, \forall v,w\in\mathbf{W_0},L=\mathrm{const}>0.
+	\end{equation}
+	Вместо точных $\nabla_w\Phi(v,w),\nabla_wP(w)$ известны их приближения $\{\nabla_w^k\Phi(v,w)\},\{\nabla_w^kP(w) \}$, удовлетворяющие условиям \eqref{[3]-6}.\\
+	Параметры $\{\alpha_k\},\{\beta_k\},\{\delta_k\},\{A_k\}$ метода удовлетворяют условиям \eqref{[3]-30}.\\
+	\textbf{Тогда} последовательность $\{v_k\}$, порожденная методом при любом выборе начального приближения $v_0\in \mathbf{W_0}$, сходится к нормальному решению $v_*$ задачи,	причем сходимость равномерна относительно выбора $\{\nabla_w^k\Phi(v,w)\},\{\nabla_w^kP(w) \}$ из \eqref{[3]-6}.
+	\end{small}
+\end{block}
+\end{frame}
+\subsection{Часть 3. Численный расчёт: проверка способности метода}
+\begin{frame}
+\frametitle{\insertsection}
+\framesubtitle{\insertsubsection}
+\begin{block}{Результат 4: Тестирование на примерах}
+	В основном, надо попробовать сдедать программу, обеспечивающую нахождение точки равновесия.\\[5mm]
+	
+	Тестовые примеры:
+	\begin{equation*}
+	\Phi(v,w)=vw,\mathbf{W}=\{w\in \mathbb{E}^1:|w|\leqslant 1 \},\mathbf{W_*}=\{0 \}.
+	\end{equation*}
+	\begin{equation*}
+	\Phi(v,w)=vw^2,\mathbf{W}=\{w\in \mathbb{E}^1:|w|\leqslant 1 \},\mathbf{W_*}=\{0,-1 \}.
+	\end{equation*}
+	Вычислительный процесс сходится к реальному решению исходной задачи с нужной точностью.
+\end{block}
+
+\end{frame}
+
+\section{Заключение}
+\begin{frame}
+\frametitle{\insertsection}
+\begin{center}
+	\begin{itemize}[label=\(\bullet\)]
+		\item Постановка равновесного программирования, примеры
+		\item Существующие методы решения 
+		\item Неустойчивость задачи и методы регуляризации
+		\item Применение нового стабилизатора
+		\begin{itemize}[label=\(\bullet\)]
+			\item  Метод стабилизации для неустойчивых равновесных задач с использованием нового стабилизатора
+			\item  Регуляризованный экстраградиентный метод с использованием нового стабилизатора
+			\item Численная проверка
+		\end{itemize} 
+	\end{itemize}
+\end{center}
+
+\end{frame}
+
+	\begin{frame}
+	\vfill
+	\centering
+	\huge \textbf{Спасибо за внимания}!
+	\vfill
+\end{frame}
+
+\end{document}

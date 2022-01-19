@@ -1,0 +1,248 @@
+\section{Метод стабилизации для неустойчивых равновесных задач}
+Первый вопрос, который обсуждается в данной работе, такой: что будет получаться в методе стабилизации, если используется стабилизатор вида $-\alpha_k\|v-w\|^2$. Будем рассматривать метод стабилизации, использующий идеи метода штрафов.
+
+Возникает естественный вопрос: в чем причина использования такого нового стабилизатора? Оказывается, что он обладает хорошим свойством, называемым \textit{сильной кососимметричностью}. Это свойство аналогично свойству сильной выпуклости в теории оптимизации - сильно выпуклость. Как известно, в идее регуляризации Тихонова к минимизируемому функционалу добавлен член $\alpha_k\|u\|^2$, который сильно выпуклый. Соответственно, мы добавляем сильно кососимметричный член $-\alpha_k\|v-w\|^2$ к функции $\Phi(v,w)$.
+\subsection{Некоторые предварительные рассуждения}
+Вернемся к постановке задачи. Рассматривается задача равновесного программирования: найти точку $v_*$ из условий
+\begin{equation}
+\label{question}
+\begin{aligned}
+v_*\in\mathbf{W}=\{w\in\mathbf{W_0} :g_i(w)&\leqslant 0,i=1,\ldots,m;g_i(w)=0,i=m+1,\ldots,s\},\\
+\Phi(v_*,v_*)&\leqslant\Phi(v_*,w),\quad\forall w\in\mathbf{W},
+\end{aligned}
+\end{equation}
+где $\mathbf{W_0}$ - заданное множество из евклидова пространства $\mathbb{E}^n$. Функции $\Phi(v,w),g_i(w),i=1,\ldots,s$ определены на множестве $\mathbf{W_0}$. Точки $v_*$, удовлетворяющие условиям \eqref{question}, называются \emph{точками равновесия}. Множество точек равновесия будем обозначать через $\mathbf{W_*}$. Предполагается, что $\mathbf{W_*}\ne\varnothing$.
+\begin{defin}
+	Будем называть функцию
+	\begin{equation}
+	\label{penalty}
+	P(w)=\sum_{i=1}^{s}[g^+_i(w)]^p,\quad w\in\mathbf{W_0},p>0
+	\end{equation}
+	\textbf{простейшей штрафной функцией}, где
+	\begin{equation*}
+	g^+_i=\max\{0;g_i\},i=1,...,m;g^+_i=|g_i|,i=m+1,...,s.
+	\end{equation*}
+\end{defin}
+\noindent Пусть приближения $\Phi_{\delta}(v,w),P_{\delta}(w)$ для функций $\Phi(v,w),P(w)$ таковы, что
+\begin{equation}
+\label{noise}
+\begin{aligned}
+&\big|\Phi_{\delta}(v,w)-\Phi(v,w)\big|\leqslant \delta\big(1+\|v\|^2+\|w\|^2\big),\quad v,w\in\mathbf{W_0},\delta >0,\\
+&\big|P_{\delta}(w)-P(w)\big|\leqslant \delta\big(1+\|w\|^2\big),\quad w\in\mathbf{W_0},\delta >0.
+\end{aligned}
+\end{equation}
+По аналогии с методом стабилизации с учетом ограничений множества и возмущений введем функцию Тихонова, используя стабилизатор вида $\Omega(v,w)=-\|v-w\|^2$:
+\begin{equation}
+\label{Tikhonov}
+t_{\delta}(v,w)=\Phi_{\delta}(v,w)+AP_{\delta}(w)-\alpha\|v-w\|^2,\quad v,w\in\mathbf{W_0},\alpha>0,A>0.
+\end{equation}
+Отметим, что этот стабилизатор, вообще говоря, не обладает свойствам, упомянутым в методах регуляризации предыдущей главы. Кроме того, это стабилизатор, зависящий от двух переменных. Тем не менее, он обладает свойством сильной кососимметричности. Будем искать точку $v_{\delta}$, удовлетворяющую условиям
+\begin{equation}
+\label{Tikhonov-condition}
+v_{\delta}\in\mathbf{W_0},\quad t_{\delta}(v_{\delta},v_{\delta})\leqslant t_{\delta}(v_{\delta},w)+\varepsilon,\quad \forall w\in\mathbf{W_0},\varepsilon>0,
+\end{equation}
+т.е. искать равновесную точку функции Тихонова. Допустим, что для некоторой точки $v_*\in \mathbf{W_*}$ существует постоянные $v>0,c_i\geqslant 0$ такие, что
+\begin{equation}
+\label{7}
+\Phi(v_*,v_*)\leqslant \Phi(v_*,w)+\sum_{i=1}^{s} c_i[g_i^+(w)]^v,\quad \forall w\in \mathbf{W_0}
+\end{equation}
+Это условие мы уже видели в обсуждении методов регуляризации. Формулируем первое вспомогательное 
+\begin{prop}
+	\label{InequOfPenFun}
+	Если для точки $v_*\in\mathbf{W_*}$ выполнено условие \eqref{7}, $p\geqslant v$, то справедливы неравенства 
+	\begin{equation}
+	\label{propsition-1}
+	\begin{aligned}
+	&\sum_{i=1}^{s}c_i[g_i^+(w)]^v\leqslant AP(w)+BA^{-v/(p-v)},\quad \forall w\in\mathbf{W_0},A>0,p>v,\\
+	&\sum_{i=1}^{s}c_i[g_i^+(w)]^v\leqslant AP(w),\quad \forall w\in\mathbf{W_0},A>|c|_{\infty}=\max\limits_{1\leqslant i\leqslant s}c_i,p=v,
+	\end{aligned}
+	\end{equation}
+	где $B=(p-v)v^{v/(p-v)}p^{-v/(p-v)}|c|^{v/(p-v)},|c|=(\sum\limits_{i=1}^{s}|c_i|^{p/(p-v)})^{(p-v)/p}$ при $p>v$.
+\end{prop}
+\noindent\emph{Доказательство.} см. \cite{centralbib}, cтр. 5. $\quad\qedsymbol$
+
+Далее приведем и \textit{докажем} предложение о достаточном условии для непустоты множества $\mathbf{W_{*\delta}}$, т.е. множество равновесных точек функции Тихонова.
+\begin{prop}
+	\label{propsition-2}
+	Если 
+	\begin{equation}
+	\label{13}
+	\begin{aligned}
+	&BA^{-v/(p-v)}+\delta\|v_*\|^2(3+A)+2(\delta+A\delta)\leqslant 1/2\varepsilon(\delta),\\ &\alpha\|v_*-w\|^2+\|w\|^2(\delta+A\delta)\leqslant 1/2 \varepsilon(\delta),\quad\forall w\in\mathbf{W_0},\delta>0,
+	\end{aligned}
+	\end{equation}
+	где точка $v_*\in\mathbf{W_*}$ выполнено условие \eqref{7}, $p\geqslant v$, то в \eqref{Tikhonov-condition} можно принять $v_{\delta}=v_*$, то есть при этих предположениях множество $\mathbf{W_{*\delta}}$ точек $v_{\delta}$, удовлетворяющих условию \eqref{Tikhonov-condition} при выборе $\Phi_{\delta}(v,w),P_{\delta}(w)$ из \eqref{noise}, непусто.
+\end{prop}
+\begin{remark}
+	Второе условия предложения будет выполнено, например, если на множество $\mathbf{W_0}$ накладывается условие ограниченности.
+\end{remark}
+
+\noindent\emph{Доказательство.} В самом деле, в силу \eqref{noise}\eqref{Tikhonov}\eqref{7}\eqref{propsition-1}\eqref{13} и $P(v_*)=0$ имеем
+\begin{align}
+&t_{\delta}(v_*,v_*)\stackrel{\eqref{Tikhonov}}{=}\Phi_{\delta}(v_*,v_*)+AP_{\delta}(v_*)\stackrel{\eqref{noise}}{\leqslant}\notag\\
+&\leqslant\Phi(v_*,v_*)+\delta(1+2\|v_*\|^2)+\overbrace{AP(v_*)}^{=0}+A[\delta(1+\|v_*\|^2)]\stackrel{\eqref{7}}{\leqslant}\notag\\
+&\leqslant \Phi(v_*,w)+\sum_{i=1}^{s}c_i[g_i^+(w)]^v+\delta\|v_*\|^2(2+A)+\delta+A\delta\stackrel{\eqref{propsition-1}}{\leqslant}\notag\\
+&\leqslant\Phi(v_*,w)+AP(w)+BA^{-v/(p-v)}+\delta\|v_*\|^2(2+A)+\delta+A\delta\stackrel{\eqref{noise}}{\leqslant}\\
+&\leqslant \Phi_{\delta}(v_*,w)+AP_{\delta}(w)\textcolor{blue}{-\alpha\|v_*-w\|^2}\textcolor{blue}{+\alpha\|v_*-w\|^2}+\notag\\
+&\quad +BA^{-v/(p-v)}+\delta\|v_*\|^2(3+A)+(2+\|w\|^2)(\delta+A\delta)\stackrel{\eqref{Tikhonov}\eqref{13}}{\leqslant}\notag\\
+&\leqslant t_{\delta}(v_*,w)+\underbrace{BA^{-v/(p-v)}+\delta\|v_*\|^2(3+A)+2(\delta+A\delta)}_{\leqslant 1/2\varepsilon(\delta)}+\notag\\
+&\quad +\underbrace{\alpha\|v_*-w\|^2+\|w\|^2(\delta+A\delta)}_{\leqslant 1/2\varepsilon(\delta)}\leqslant t_{\delta}(v_*,w)+\varepsilon(\delta).\,\quad \qedsymbol \notag
+\end{align}
+Заметим, что дальнейшее изложение не зависит от способа поиска
+точек $v_{\delta}\in\mathbf{W_{*\delta}}$, для нас будет важен лишь сам факт существования таких точек.
+\begin{defin}
+	Если выполнено
+	\begin{equation}
+	\label{cososymmetric}
+	\Phi(w,w)-\Phi(w,v)-\Phi(v,w)+\Phi(v,v)\geqslant 0,\quad \forall w,v\in\mathbf{W_0},
+	\end{equation}
+	то говорят, что функция $\Phi(v,w)$ \textbf{кососимметрична}. 
+\end{defin}
+\noindent Свойства функций, принадлежащих к классу кососимметричных, можно посмотреть, например, в \cite{8}. Заметим, что из \eqref{cososymmetric} при $v=v_*$ и условия \eqref{7} следует, что 
+\begin{equation}
+\label{15}
+\Phi(w,w)-\Phi(w,v_*)\geqslant \Phi(v_*,w)-\Phi(v_*,v_*)\geqslant -\sum_{i=1}^{s}c_i[g_i^+(w)]^v,\quad \forall w\in\mathbf{W_0}.
+\end{equation}
+\noindent Ещё одно предложение, которое используется в ходе доказательства метода:
+\begin{prop}
+	\label{lemma11}
+	Пусть $z,b,d\geqslant 0,p>1$ таковы, что
+	\begin{equation}
+	0\leqslant z^p\leqslant bz+d.
+	\end{equation}
+	Тогда
+	\begin{equation}
+	0\leqslant z\leqslant (b^q+qd)^{1/p},
+	\end{equation}
+	где $q$ определяется равенством $\frac{1}{p}+\frac{1}{q}=1$.
+\end{prop}
+\noindent\emph{Доказатеьство.} см. \cite{numMethodopt}, cтр. 99, лемма 11. $\quad\qedsymbol$
+\subsection{Описание метода стабилизации с использованием нового стабилизатора}
+Переходим к самому описанию метода стабилизации. Основная теорема, описывающая сходимость метода стабилизации, формулируется и доказывается следующим образом: 
+\begin{theo}
+	\label{theor-1}
+	Пусть выполнены следующие условия\\
+	\textbf{1)} $\mathbf{W_0}$ - замкнутое ограниченное множество, функции $g_i(w),i=1,...,m,|g_i(w)|,i=m+1,\ldots,s,\Phi(w,w)$ полунепрерывны снизу на $\mathbf{W_0}$; функция $\Phi(v,w)$ полунепрерывна сверху по $v$ на $\mathbf{W_0}$ при любом фиксированном $w\in\mathbf{W_0}$; множество $\mathbf{W_*}$ решений задачи \eqref{question} непусто; для некоторой точки $v_*\in\mathbf{W_*}$ выполнено неравенство \eqref{7}; функция $\Phi(v,w)$ кососимметрична на $\mathbf{W_0}$, т.е. выполнено неравенство \eqref{cososymmetric};\\
+	\textbf{2)} $\Omega(v,w)=-\alpha_k\|v-w\|^2$ - стабилизатор задачи \eqref{question}, $P(w)$ - штрафная функция, определенная формулой \eqref{penalty} при $p\geqslant v$;\\
+	\textbf{3)} приближения $\Phi_{\delta}(v,w),P_{\delta}(w)$ функций $\Phi(v,w),P(w)$ удовлетворяют условиям \eqref{noise};\\
+	\textbf{4)} параметры $\alpha=\alpha(\delta)>0,A=A(\delta)>0,\varepsilon=\varepsilon(\delta)>0,\delta>0$, удовлетворяют условиям \eqref{13} и, кроме того,
+	\begin{equation}
+	\label{16}
+	\begin{aligned}
+	&\lim_{\delta\rightarrow 0}\alpha(\delta)=0,\quad \lim_{\delta\rightarrow 0}A(\delta)=0,\quad \lim_{\delta\rightarrow 0}\varepsilon(\delta)=0,\quad\lim_{\delta\rightarrow 0} \delta A(\delta)=0,\\
+	&\sup_{\delta>0}\frac{3\delta+\delta A(\delta)}{\alpha(\delta)}<+\infty,\quad \sup_{\delta>0}\frac{\varepsilon(\delta)}{\alpha(\delta)}<+\infty.
+	\end{aligned}
+	\end{equation}
+	Тогда множество $\mathbf{W_{*\delta}}\ne\varnothing$ при всех $\delta>0$, и 
+	\begin{equation}
+	\label{17}
+	\lim_{\delta\rightarrow 0}\rho(v_{\delta},\mathbf{W_*})=0,\quad\lim_{\delta\rightarrow 0} \rho(\Phi(v_{\delta},v_{\delta}),\Phi_*)=0,
+	\end{equation}
+	где $\Phi_*$ - множество значений функций $\Phi(v,v)$, когда $v$ пробегает множество $\mathbf{W_*}$, причем сходимость в \eqref{17} равномерная относительно выбора $\Phi_{\delta}(v,w),P_{\delta}(w)$ из \eqref{noise} и точки $v_{\delta}$ из $\mathbf{W_{*\delta}}$.
+\end{theo}
+\noindent\emph{Доказательство.} Из предложения \ref{propsition-2} и условия \eqref{7}\eqref{13} следует, что $\mathbf{W_{*\delta}}\ne\varnothing$, $\forall\delta >0.$ Для любой точки $v_{\delta}\in\mathbf{W_{*\delta}}$ в силу \eqref{noise}-\eqref{Tikhonov-condition} имеем
+\begin{equation}
+\label{18}
+\begin{aligned}
+&\Phi(v_{\delta},v_{\delta})\leqslant \Phi(v_{\delta},v_{\delta})+\overbrace{AP(v_{\delta})}^{\geqslant 0}\stackrel{\eqref{noise}}{\leqslant}\\
+&\leqslant\Phi_{\delta}(v_{\delta},v_{\delta})+AP_{\delta}(v_{\delta})+\delta(1+2\|v_{\delta}\|^2)+A\delta(1+\|v_\delta\|^2)\leqslant\\
+&\leqslant\Phi_{\delta}(v_{\delta},v_{\delta})+AP_{\delta}(v_{\delta})\textcolor{blue}{-\alpha\|v_{\delta}-w\|^2}+\delta\|v_{\delta}\|^2(2+A)+\\
+&\quad +\delta+A\delta\textcolor{blue}{+\alpha\|v_{\delta}-w\|^2}\stackrel{\eqref{Tikhonov-condition}}{\leqslant}\\
+&\leqslant t_{\delta}(v_{\delta},v_{\delta})+\delta\|v_{\delta}\|^2(2+A)+\delta+A\delta+\alpha\|v_{\delta}-w\|^2\stackrel{\eqref{Tikhonov}\eqref{Tikhonov-condition}}{\leqslant}\\
+&\leqslant \Phi_{\delta}(v_{\delta},w)+AP_{\delta}(w)\cancel{-\alpha\|v_{\delta}-w\|^2}+\varepsilon+\delta\|v_{\delta}\|^2(2+A)+\\
+&\quad+\delta+A\delta\cancel{+\alpha\|v_{\delta}-w\|^2}\stackrel{\eqref{noise}}{\leqslant}\\
+&\leqslant \Phi(v_{\delta},w)+AP(w)+\delta\|v_{\delta}\|^2(3+A)+(2+\|w\|^2)(\delta+A\delta)+\varepsilon,\forall w\in \mathbf{W_0}.
+\end{aligned}
+\end{equation}
+Пусть $w=v_*$, где $v_*$ - точка, удовлетворяющая условию \eqref{7}. Продолжим неравенство: из \eqref{propsition-1}\eqref{15} и $P(v_*)=0$ получаем
+\begin{equation}
+\label{18-2}
+\begin{aligned}
+&\Phi(v_{\delta},v_*)+\overbrace{AP(v_*)}^{ P(v_*)=0}+\delta\|v_{\delta}\|^2(3+A)+(2+\|v_*\|^2)(\delta+A\delta)+\varepsilon\stackrel{\eqref{15}}{\leqslant}\\
+&\leqslant \Phi(v_{\delta},v_{\delta})+\sum_{i=1}^{s}c_i[g_i^+(v_{\delta})]^v+\delta\|v_{\delta}\|^2(3+A)+(2+\|v_*\|^2)(\delta+A\delta)+\varepsilon\stackrel{\eqref{propsition-1}}{\leqslant}\\ 
+&\leqslant \Phi(v_{\delta},v_{\delta})+AP(v_{\delta})+BA^{-v/(p-v)}+\delta\|v_{\delta}\|^2(3+A)+(2+\|v_*\|^2)(\delta+A\delta)+\varepsilon.
+\end{aligned}
+\end{equation}
+Далее, выделяя из цепочки \eqref{18}\eqref{18-2} неравенств второе и предпоследнее, получаем
+\begin{equation}
+\label{22}
+\begin{aligned}
+&AP(v_{\delta})\leqslant\sum_{i=1}^{s}c_i[g_i^+(v_{\delta})]^v+\delta\|v_{\delta}\|^2(3+A)+(2+\|v_*\|^2)(\delta+A\delta)+\varepsilon=\\
+&=\sum_{i=1}^{s}c_i[g_i^+(v_{\delta})]^v+\alpha\left[\|v_{\delta}\|^2\overbrace{\left(\frac{3\delta+\delta A}{\alpha} \right)}^{\leqslant \text{const}}+(2+\|v_*\|^2)\cdot \overbrace{\frac{\delta+\delta A}{\alpha}}^{\leqslant\text{const}}+\overbrace{\frac{\varepsilon}{\alpha}}^{\leqslant\text{const}} \right]\stackrel{\eqref{16}}{\leqslant}\\
+&\leqslant \sum_{i=1}^{s}c_i[g_i^+(v_{\delta})]^v+\alpha C_1,
+\end{aligned}
+\end{equation}
+где $C_1=\|v_{\delta}\|^2\sup\limits_{\delta>0}[3\delta+\delta A(\delta)/\alpha(\delta)]+(2+\|v_*\|^2)\sup\limits_{\delta>0}[\delta+\delta A(\delta)/\alpha(\delta)]+\sup\limits_{\delta>0}[\varepsilon/\alpha]\leqslant+\infty$ в силу \eqref{16}.\\
+Если $p=v$, то 
+\begin{equation}
+\label{23}
+\begin{aligned}
+&AP(v_{\delta})\leqslant\sum_{i=1}^{s}c_i[g_i^+(v_{\delta})]^v+\alpha C_1\leqslant|c|_{\infty}\sum_{i=1}^{s}[g_i^+(v_{\delta})]^v+\alpha C_1=|c|_{\infty}P(v_\delta)+\alpha C_1\\
+&\Rightarrow 0\leqslant AP(v_{\delta})\leqslant \frac{A}{A-|c|_{\infty}}\alpha C_1,\quad p=v.
+\end{aligned}
+\end{equation}
+Если $p>v$, то используя неравенство Гёльдера
+\begin{equation}
+\sum_{i=1}^{s}a_ib_i\leqslant\left(\sum_{i=1}^{s}a_i^q \right)^{1/q}\left(\sum_{i=1}^{s}b_i^r \right)^{1/r},\quad \forall a_i,b_i\geqslant 0,r,q>1,\frac{1}{q}+\frac{1}{r}=1
+\end{equation} 
+при $q=p/v,r=p/(p-v),a_i=g_i^+(v_{\delta})^v,b_i=c_i$ с учетом \eqref{22} имеем
+\begin{equation}
+\begin{aligned}
+&\sum_{i=1}^{s}[g_i^+(v_{\delta})]^v c_i=\left(\sum_{i=1}^{s}[g_i^+(v_{\delta})]^p \right)^{v/p}\cdot\left(\sum_{i=1}^{s}c_i^{p/(p-v)} \right)^{(p-v)/p}=|c|P(v_{\delta})^{v/p}\\
+&\Rightarrow 0\leqslant AP(v_{\delta})\leqslant |c|P(v_{\delta})^{v/p}+\alpha C_1,\quad p>v.
+\end{aligned}
+\end{equation}
+Теперь обозначим $z=[AP(v_{\delta})]^{v/p}$, имеем $0\leqslant z^{p/v}\leqslant |c|A^{-v/p}z+\alpha C_1$. Тогда в силу предложения \ref{lemma11} имеем
+\begin{equation}
+\label{24}
+0\leqslant AP(v_{\delta})\leqslant z^{p/v}\leqslant |c|^{p/(p-v)}A^{-v/(p-v)}+\frac{p}{p-v}\alpha C_1.
+\end{equation}
+Тогда в силу \eqref{16}\eqref{23}\eqref{24} получаем
+\begin{equation}
+\label{25}
+\begin{aligned}
+&\lim_{\delta\rightarrow 0}A(\delta)P(v_{\delta})=0=\lim_{\delta\rightarrow 0}\overbrace{\frac{A}{A-|c|_{\infty}}}^{\rightarrow 1\text{ при }A\rightarrow\infty}\overbrace{\alpha C_1}^{\rightarrow 0},p=v;\\
+&\lim_{\delta\rightarrow 0}A(\delta)P(v_{\delta})=0=\lim_{\delta\rightarrow 0}|c|^{p/(p-v)}\overbrace{A^{-v/(p-v)}}^{\rightarrow 0\text{ при }A\rightarrow\infty}+\overbrace{\frac{p}{p-v}\alpha C_1}^{\rightarrow 0},p>v
+\end{aligned}
+\end{equation}
+Поскольку $\mathbf{W_0}$ - ограниченное множество, имеем $\sup\limits_{\delta>0}|v_{\delta}|<C_2$. Из теоремы Больцано-Вейерштрасса получаем, что семейство точек $\{v_{\delta} \}$ при $\delta\rightarrow 0$ имеет хотя бы одну предельную точку $v_0$. Пусть $\lim\limits_{k\rightarrow\infty}v_{\delta_k}=v_0$, где $\{\delta_k \}\rightarrow 0$ при $k\rightarrow \infty$. В силу замкнутости $\mathbf{W_0}$ имеем $v_0\in\mathbf{W_0}$, Из \eqref{16}\eqref{25} и полунепрерывности снизу функции $P(w)$ следует: $0\leqslant P(v_0)\leqslant \varliminf\limits_{k\rightarrow 0}P(v_{\delta_k})=\textcolor{blue}{\{\lim\limits_{\delta\rightarrow 0} A(\delta)P(v_{\delta})=0,\lim\limits_{\delta\rightarrow 0}A(\delta)\rightarrow\infty\}}=0$, поэтому $ P(v_0)=0,$ значит $v_0\in\mathbf{W}.$\\
+Далее, выберем в \eqref{18} первое и последное звенья, следуя $P(w)=0,w\in\mathbf{W}$ и сделаем предельный переход при $\delta=\delta_k\rightarrow 0$:
+\begin{equation}
+\label{varlim}
+\begin{aligned}
+&\Phi(v_{\delta},v_{\delta})\leqslant \Phi(v_{\delta},w)+\overbrace{AP(w)}^{=0}+2\overbrace{\delta\|v_{\delta}\|^2(2+A)}^{\eqref{16},\rightarrow 0}+2\overbrace{(\delta+A\delta)}^{\eqref{16},\rightarrow 0}+\overbrace{\varepsilon}^{\rightarrow 0}\Rightarrow\\
+&\Rightarrow\varlimsup\limits_{k\rightarrow\infty}\Phi(v_{\delta},v_{\delta})\leqslant \varlimsup\limits_{k\rightarrow\infty}\Phi(v_{\delta},w)
+\end{aligned}
+\end{equation} 
+Поэтому в силу свойств функции $\Phi(v,w)$ имеем
+\begin{equation}
+\begin{aligned}
+&\Phi(v_0,v_0)\overbrace{\leqslant}^{\text{п/н снизу.}}\varliminf\limits_{k\rightarrow\infty}\Phi(v_{\delta_k},v_{\delta_k})\leqslant\varlimsup\limits_{k\rightarrow\infty}\Phi(v_{\delta_k},v_{\delta_k})\stackrel{\eqref{varlim}}{\leqslant}\\
+&\leqslant\varlimsup\limits_{k\rightarrow\infty}\Phi(v_{\delta_k},w)\overbrace{\leqslant}^{\text{п/н сверху.}}\Phi(v_0,w),\quad\forall w\in\mathbf{W}.
+\end{aligned}
+\end{equation}
+Таким образом, каждая предельная точка $v_0$ семейства $\{v_{\delta} \}$ при $\delta\rightarrow 0$ удовлетворяет условиям $v_0\in\mathbf{W_*},\Phi(v_0,v_0)\in\Phi_*$. Равенства \eqref{17} доказаны.\\
+Остается убедиться в том, что сходимости в \eqref{17} равномерны относительно $\Phi_{\delta}(v,w),P_{\delta}(w)$ из \eqref{noise}, $v_{\delta}$ из $\mathbf{W_{*\delta}}$. Для этого надо показать, что 
+\begin{equation}
+\label{26}
+\lim_{\delta\rightarrow 0}\sup_{v\in\mathbf{W_{*\delta}}}\rho(v,\mathbf{W_*})=0,\quad\lim_{\delta\rightarrow 0}\sup_{v\in\mathbf{W_{*\delta}}}\rho(\Phi(v,v),\Phi_*)=0.
+\end{equation}
+Пусть $\{\delta_k\}$ - выбрана подпоследовательность, на которой достигается верхний предел, то есть
+\begin{equation}
+\label{def}
+\varlimsup_{\delta\rightarrow 0}\sup_{v\in\mathbf{W_{*\delta}}}\rho(v,\mathbf{W_*})=\lim_{k\rightarrow\infty} \sup_{v\in\mathbf{W_{*\delta}}}\rho(\Phi(v,v),\Phi_*).
+\end{equation}
+По определению верхней грани, для любого номера $k$ найдётся точка $v_{\delta_k}\in\mathbf{W_{*\delta_k}}$, соответствующая какой-то реализации $\Phi_{\delta}(v,w),P_{\delta}(w)$ из \eqref{noise} при $\delta=\delta_k$ такая, что
+\begin{equation}
+\label{27}
+\sup_{v\in\mathbf{W_{*\delta}}}\rho(v,\mathbf{W_*})\leqslant\rho(v_{\delta_k},\mathbf{W_*})+\frac{1}{k},\quad k=1,2,\ldots
+\end{equation}  
+Из \eqref{17} при $\delta=\delta_k$ имеем $\lim\limits_{\delta\rightarrow 0}\rho(v_{\delta_k},\mathbf{W_*})=0$. После этого в \eqref{27} сделаем предельный переход при $k\rightarrow \infty$ с учётом свойства предела и \eqref{def}, следует
+\begin{equation}
+0\leqslant \varliminf_{\delta\rightarrow 0}\sup_{v\in\mathbf{W_{*\delta}}}\rho(v,\mathbf{W_*})\leqslant\varlimsup_{\delta\rightarrow 0}\sup_{v\in\mathbf{W_{*\delta}}}\rho(v,\mathbf{W_*})\leqslant\lim_{\delta\rightarrow 0}\sup_{v\in\mathbf{W_{*\delta}}}\rho(v,\mathbf{W_*})=0
+\end{equation}
+что равносильно первому равенству \eqref{26}, поскольку верхний и нижний предел равны нулю. Второе равенство \eqref{26} устанавливается аналогично. Теорема \ref{theor-1} доказана. $\qedsymbol$
+
+Итак, метод стабилизации с использованием стабилизатора $-\alpha_k\|v-w\|^2$ формально описан и доказана его сходимость. 
+\clearpage
+%\newpage

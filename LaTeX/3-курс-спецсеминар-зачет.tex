@@ -1,0 +1,245 @@
+%% Unofficial beamer template for IMPA.
+%% Author: Rafael Vieira Westenberger, IMPA, Brazil
+%% Figures and colors chosen according to:
+%% https://impa.br/wp-content/uploads/2016/12/manual_marca_impa.pdf
+%% This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+
+\documentclass[aspectratio=1610]{beamer}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{biolinum}
+\usepackage{microtype}
+\usepackage[english,russian]{babel}
+\usepackage{color,xcolor}
+\usefonttheme[onlymath]{serif}
+\usetheme[nofirafonts]{focus}
+
+
+%% Prevents numbering on continued frames (messes up impa logo otherwise)
+\setbeamertemplate{frametitle continuation}{}
+\setbeamertemplate{caption}[numbered]
+
+%% Two different options for bottom bar. Default is progressbar.
+%\usetheme[nofirafonts,numbering=fullbar]{focus}
+%\usetheme[nofirafonts,numbering=none]{focus}
+
+%% Leave one uncommented to choose which official IMPA color to use:
+% IMPA Azul:
+\definecolor{main}{RGB}{0, 75, 135}
+% IMPA Cinza
+%\definecolor{main}{RGB}{83, 86, 90}
+
+%% Defines command that adds small IMPA logo to titlebars
+%\newcommand{\impa}
+% {\hfill {\includegraphics[height=0.5cm]{impalogo/smbu.pdf}}}
+
+%% Sets footnote references to numeric.
+\renewcommand{\thempfootnote}{\arabic{mpfootnote}}
+
+%% Defines progressive outline for sections
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+%    \frametitle{Outline for section \thesection}
+    \frametitle{Содержания доклада}
+    \tableofcontents[currentsection,hideothersubsections]
+  \end{frame}
+}
+     
+%% Suppresses outline frames for subsections.
+\AtBeginSubsection[]
+
+%% Defines Title Page.
+
+\title{Тема - Задача коммивояжёра \\
+	и её методы решения}
+\subtitle{\textit{Оптимальное управление}}
+%\author{Сюй Минчуань\footnote
+%            {\label{1} Университет МГУ-ППИ в Шэньчжэне, Шэньчжэнь, Китай}}
+%\titlegraphic{\vspace*{2em}
+%             \includegraphics[scale=0.45]
+%               {impalogo/impa_logo_full.pdf}}
+\institute{\textbf{Докладчик:}\\ 
+            Сюй Минчуань\\
+            Совместный Университет МГУ-ППИ в Шэньчжэне\\
+       	    Факультет ВМК, III курс}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+  
+\section{Задача коммивояжёра}
+  \subsection{Постановка задачи}
+  
+   \begin{frame}
+   \frametitle{Математическая постановка задачи}
+        Имеется N городов, занумерованных числами $1,2,\ldots,N$. Для любой пары городов $(i,j)$ задано расстояние $c_{ij}$  (критерий выгодности: расстояние, время, стоимость, совокупный критерий и.т.д.) между ними. Начиная с какого-то города, коммивояжер должен побывать во всех городах \textbf{ровно по одному разу}, и вернуться в начальный город. Требуется найти минимальный маршрут.
+        \par
+        Будем считать, что $c_{ii}=+\infty, i=1,2,\ldots,n.$ Таким образом, зачада коммивояжера (ЗКВ) сводится к задачи минимизации
+        \begin{equation}
+        J(u)=c_{1i_{1}}+c_{i_{1}i_{2}}+\ldots+c_{i_{N-1}1}\rightarrow min
+        \end{equation}
+        на множестве допустимых маршрутов $u=(1,i_{1},i_{2},\ldots,i_{N-1},1)$, где $(i_{1},i_{2},\ldots,i_{N-1})$ - любая перестановка чисел $2,3,\ldots,N$. Удобнее записать ЗКВ в матрице смежности:
+        $C=\left\{c_{i j}\right\}=\left(\begin{array}{ccccc}
+        	\infty & c_{12} & c_{13} & \dots & c_{1 N} \\
+        	c_{21} & \infty & c_{23} & \dots & c_{2 N} \\
+        	c_{31} & c_{32} & \infty & \dots & c_{3 N} \\
+        	\cdots & \cdots & \cdots & \cdots & \cdots \\
+        	c_{N 1} & c_{N 2} & c_{N 3} & \cdots & \infty
+        \end{array}\right)$
+    \end{frame}
+  
+  \subsection{Динамическое программирование}
+  	\begin{frame}
+  		\frametitle{Динамическое программирование}
+  		\textbf{Дискретная задача оптимального управления (вспомогательная)\\}
+  		\begin{equation}
+  		\left\{\begin{matrix}
+  			J\left(x,\left[u_{i}\right]_{k}\right)=\sum_{i=k}^{N-1} G_{i}\left(x_{i}, u_{i}\right)+\Phi\left(x_{N}\right) \rightarrow \text { inf } \\
+  			x_{i+1}=F_{i}\left(x_{i}, u_{i}\right), i=k, k+1, \ldots, N-1, \quad x_{k}=x \\
+  			x_{i} \in X_{i}, \quad i=k, k+1, \ldots, N \\
+  			{\left[u_{i}\right]_{k}=\left(u_{k}, u_{k+1}, \ldots, u_{N-1}\right), u_{i} \in V_{i}, \quad i=k, k+1, \ldots, N-1}
+  		\end{matrix}\right
+  		\end{equation}\\
+  		где $k \in\{0,1,2, \ldots, N-1\}$, и $x \in X_{k}$.\\
+  		Через $\Delta_{k}(x)$ обозначим множество всех управлений $\left[u_{i}\right]_{k}\right$ таких, что:
+  		\begin{itemize}
+  		\item $u_{i} \in V_{i}, \quad i=k, k+1, \ldots, N-1.$
+  		\item $\left[x_{i}\right]_{k}=\left(x_{k}=x, x_{k+1}, \ldots, x_{N}\right)$, где $\left[x_{i}\right]_{k}$ - соответствующие траектории, удовлетворяющие фазовым ограничениям: $x_{i} \in X_{i}, \quad i=k, k+1, \ldots, N$
+  		\end{itemize}
+ 	
+  		\textbf{Функция Беллмана дискретной задачи\\}
+  		\begin{equation}
+  		B_{k}(x)=\inf _{\left[u_{i}\right]_{k} \in \Delta_{k}(x)} J_{k}\left(x,\left[u_{i}\right]_{k}\right), \quad k=0,1, \ldots, N-1
+  		\end{equation}
+  		Областью определения этой функции является $\mathcal{X}_{k}=\left\{x \in X_{k}: \Delta_{k}(x) \neq \varnothing \right\}$.\\
+  		Функция Беллмана дискретной задачи удовлетворяет \textbf{уравнению Беллмана}.
+  		
+  	\end{frame}
+  
+  	\begin{frame}
+  		\frametitle{Принцип оптимальности}
+  		\textbf{Принцип оптимальности в общем случае\\}
+  		Если $\left[u_{i}\right]_{*}=\left(u_{0}^{*}, \ldots, u_{N-1}^{*}\right),\left[x_{i}\right]_{*}=\left(x_{0}^{*}, \ldots, x_{N}^{*}\right)$ - оптимальные управление и
+  		траектория исходной задачи, то в любой вспомогательной задаче при $x_{k}=x_{k}^{*}$  оптимальными будут управление  $\left[u_{i}\right]_{k}=\left(u_{k}^{*}, \ldots, u_{N-1}^{*}\right)$  и траектория  $\left[x_{i}\right]_{k}=\left(x_{k}^{*}, \ldots, x_{N}^{*}\right)$.\\
+  		\textbf{Принцип оптимальности для ЗКВ\\}
+  		Обозначим через $B_{k-1}\left(1, i_{1}, \ldots, i_{k}\right)$ функцию Беллмана, равную длине самого короткого из маршрутов, соединяющих города 1 и $i_{k}$ и проходящих в любом порядке через города $i_{1}, \ldots, i_{k}$.
+  		Принцип оптимальности, примененный в 3КВ, дает такой результат:
+  		функция Беллмана при всех $k=0,1, \ldots, N-1$  удовлетворяет уравнению Беллмана
+  		\begin{equation}
+  		B_{k}\left(1, i_{1}, \ldots, i_{k}, i_{k+1}\right)=\min \left\{\begin{array}{c}
+  			B_{k-1}\left(1, i_{2}, i_{3}, i_{4}, \ldots, i_{k-1}, i_{k}, i_{1}\right)+c_{i_{1} i_{k+1}} \\
+  			B_{k-1}\left(1, i_{1}, i_{3}, i_{4}, \ldots, i_{k-1}, i_{k}, i_{2}\right)+c_{i_{2} i_{k+1}} \\
+  			B_{k-1}\left(1, i_{1}, i_{2}, i_{4}, \ldots, i_{k-1}, i_{k}, i_{3}\right)+c_{i_{3} i_{k+1}} \\
+  			\cdots\\
+  			B_{k-1}\left(1, i_{1}, i_{2}, i_{3}, \ldots, i_{k-2}, i_{k}, i_{k-1}\right)+c_{i_{k-1} i_{k+1}} \\
+  			B_{k-1}\left(1, i_{1}, i_{2}, i_{3}, \ldots, i_{k-2}, i_{k-1}, i_{k}\right)+c_{i_{k} i_{k+1}}
+  		\end{array}\right\}
+  		\end{equation}	
+  	\end{frame}
+  
+  	\begin{frame}
+  	\frametitle{Вычислительная схема}
+  		То есть, зная оптимальное решение задачи коммивояжера для \textbf{$\textbf{k}$ городов}, мы можем очень легко найти решение задачи коммивояжера, получающейся добавлением к ней \textbf{$\textbf{(k+1)}$-го города}: оптимальное движение по $k+1$ городу повторит оптимальное движение по k городам.
+  		\par
+  		Иными словами, мы можем последовательно решить подзадачу, при этом не теряем оптимальность решения. Очевидно, этот метод требует больше памяти при расчёте, но разложив исходную задачу в подзадачи, мы значительно уменьшаем время для получения решения по сравнению с методом перебора, который таже с помошью суперкомпьютера в небольшом размерности задачи нельзя решить задачу в разумное время.
+  		\par
+  		Задача коммивояжера является \textbf{NP-полной} проблемой, к которой можно свести любую другую задачу из класса NP за полиномиальное время. Таким образом, NP-полные задачи образуют в некотором смысле подмножество «самых сложных» задач в классе NP; и если для какой-то из них будет найден быстрый алгоритм решения, то и любая другая задача из класса NP может быть решена так же быстро.
+  		
+	\end{frame}
+
+	\begin{frame}
+	\frametitle{Практическая реализация}
+	Основная часть реализации динамического программирования
+	\begin{figure}[h]
+		%\small
+		\centering
+		\includegraphics[height=7cm,width=14cm]{code_1}
+	\end{figure}
+	
+	\end{frame}
+
+
+\section{Другие методы её решения}
+
+\subsection{Классы методов для ЗКВ}
+	\begin{frame}
+		\frametitle{Классы методов для ЗКВ}
+		Конечно, для этой классической задачи разработаны многие достадочно эффективные методы. В общем можем их разделять на два класса: \textbf{точные методы} и \textbf{приближённые}. К точным методам известны как 
+		\begin{itemize}
+		\item Динамическое  программирование
+		\item Метод ветвей и границ
+		\item Жадный алгоритм
+		\end{itemize}
+		К приближённым методам относится ряд \textbf{эвристичеких методов} как
+		\begin{itemize}
+		\item Генетический алгоритм
+		\item Алгоритм имитации отжига
+		\item Муравьиный алгоритм
+		\item Нейронные сети
+		\end{itemize}
+		и.т.д. 
+	\end{frame}
+
+\subsection{Генетический алгоритм}
+	\begin{frame}
+		\frametitle{Генетический алгоритм}
+		Сейчас рассмотрим более интересные методы. \textbf{Генетический алгоритм} основан на идее эволюции с помощью \textbf{естественного отбора}. 
+		
+		1: установливается начальное поколение $k=0$\\
+		2: вероятность проведения кроссовера = $\alpha$\\
+		3: вероятность мутации = $\beta$\\ 
+		4: построить популяцию из n случайно сгенерированных особей $P_{k}$\\ 
+		5: {\color{red} while} не остановится {\color{red} do} \\
+		6: \quad {\color{blue} оценивание}: вычислять приспособленность(i) для каждой особи $P_{k}$\\ 
+		7: \quad {\color{blue} выбор}: выбирать m членов $P_{k}$  и вставлять в $P_{k+1}$\\
+		8: \quad {\color{blue} кроссовер}: генерировать $\alpha m$ потомков кроссовером и вставлять в $P_{k+1}$ \\
+		9: \quad {\color{blue} мутация}: генерировать $\beta m$  потомков мутацией и вставлять в $P_{k+1}$ \\
+		10: \ \ обновление поколения: $k=k+1$ \\
+		11: {\color{red} end while}\\
+		12: вернуть сильнейшую особь из $P_{\text {last }}$ \\
+		В отличие от градиентного метода, генетические алгоритмы не «застревают» в точках локального экстремума, а позволяют найти «глобальный» минимум.
+	\end{frame}
+
+
+\subsection{Алгоритм имитации отжига}
+	\begin{frame}
+		\frametitle{Алгоритм имитации отжига}
+		Алгоритм вдохновлён \textbf{процессом отжига} в металлургии — техники, заключающейся в нагревании и контролируемом охлаждении металла, чтобы увеличить его кристаллизованность и уменьшить дефекты.
+		
+		1: установливается начальное приближение $x_{0}$, и $x^{\text{ current}}=x_{0}$\\ 
+		2: установливается начальное температура  $T=T_{0}$\\ 
+		3: {\color{red} while} не остановится {\color{red} do}\\
+		4: \quad {\color{red} for}  $i=1$ to $T_{L}$ {\color{red}do}\\
+		5: \quad \quad  случайно генерировать соседное решение $x^{\prime} \in N\left(x^{\text { current }}\right)$ \\
+		6: \quad \quad вычислять изменение  $\operatorname{cost} \Delta C=C\left(x^{\prime}\right)-C\left(x^{\text{  current}}\right)$ \\
+		7: \quad \quad {\color{red} if}  $\Delta C \leq 0$  {\color{red}or} random  $(0,1)<\exp \left(-\frac{\Delta C}{k T}\right)$  {\color{red} then}\\
+		8: \quad \quad \quad $x^{\text{ current }}=x^{\prime}$\ {\color{blue} [принять новое состояние] }\\ 
+		9: \quad \quad {\color{red} end if}\\
+		10: \ \ {\color{red} end for}\\
+		11: \quad \quad установливается новая температура  $T=\operatorname{decrease}(T)$\ {\color{blue}  [понижать температуру] } \\
+		12: {\color{red} end while}\\
+		13: вернуть решение, соответствующее минимуму функции $\text{cost}$\\
+		
+	\end{frame} 
+	
+  
+	\begin{frame}
+	\frametitle{Пример: Кратчайший путь экскурсии по Китаю}
+		\begin{figure}[h]
+			%\small
+			\centering
+			\includegraphics[height=7cm,width=10cm]{routechina}
+		\end{figure}
+
+	\end{frame}
+
+	\begin{frame}[focus]
+        Спасибо за внимания! \\
+        Вопросы?
+	\end{frame}
+
+
+\end{document}

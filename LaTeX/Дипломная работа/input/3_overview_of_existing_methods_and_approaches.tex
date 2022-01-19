@@ -1,0 +1,287 @@
+\counterwithin{equation}{section} 
+\section{Обзор существующих подходов к решению \newline равновесных задач}
+К данному моменту проведено большое количество исследований методов решения равновесных задач. Здесь мы проведем обзор основных методов к решению поставленной задачи, которая имеет характер неустойчивости при возмущенных данных. С учетом этого, мы будем концентрироваться как на методах, основанных на классической постановке, так и на регуляризованных методах, необходимых в случае возмущенных данных. Сразу заметим, что в приведенных ниже методах регуляризации даются только способы регуляризации, а не рассматриваются конкретные методы для вспомогательных равновесных задач. О них можно, например, узнать в работах \cite{centralbib-2}\cite{15}\cite{16}, или в главе 3.
+\subsection{Основные конструктивные методы}
+\textbf{Методы градиентного типа}: Концепция \textit{градиентного спуска}, широко используемая в теории оптимизации, переносится в область исследования равновесного программирования, но с учетом характера равновесных задач добавляется ещё один \textit{прогнозный шаг}. 
+
+Рассмотрим вычислительный процесс, на каждой итерации которого в качестве вспомогательной задачи осуществляются две \textit{операции проектирования} на множество $\mathbf{W}$. Пусть начальное приближение $v_0\in \mathbf{W}$ - задано. Последовательный итерационный процесс описывается следующим образом:
+\begin{equation}
+\label{gradient method}
+\left\{\begin{array}{l}
+u_{k}=\operatorname{Pr}_{\mathbf{W}} \big[ v_k-\alpha_k\nabla_w\Phi(v_k,v_k)\big],\\
+v_{k+1}=\operatorname{Pr}_{\mathbf{W}} \big[ v_k-\alpha_k\nabla_w\Phi(u_k,u_k)\big],
+\end{array}\right.
+\end{equation} 
+$\mathrm{Pr}_{\mathbf{W}}$ - операция проектирования на множество $\mathbf{W}$. Вычисление $u_k$ - прогнозный шаг. Если этот шаг осуществляется только по одной из переменных, например, по первой, то получаем процесс в форме
+\begin{equation}
+\left\{\begin{array}{l}
+u_{k}=\operatorname{Pr}_{\mathbf{W}} \big[ v_k-\alpha_k\nabla_w\Phi(v_k,v_k)\big],\\
+v_{k+1}=\operatorname{Pr}_{\mathbf{W}} \big[ v_k-\alpha_k\nabla_w\Phi(u_k,\textcolor{blue}{v_k})\big],
+\end{array}\right.
+\end{equation}
+Приведем теорему о сходимости метода к одному из равновесных решений. Доказательство её можно найти в \cite{8}\cite{8-2}.
+\begin{theo}
+	Если множество решений задачи \eqref{intro-1} не пусто и удовлетворяет условию кососимметричности\cite{8} на множестве $\mathbf{W}$, целевая функция $\Phi(v,w)$ непрерывна по $v$, и выпукла по $w$ при любом $v\in\mathbf{W}$, $g_i(w),i=1,...,m$ - выпуклы, $\mathbf{W}\in\mathbb{R}^n$ - выпуклое замкнутое множество, кроме того, функции $\nabla\Phi(v,w),g(w)$ и $\nabla g(w)$ удовлетворяют условиям Липшица с константами $|\nabla\Phi|,|g|$ и $|\nabla g|$, то последовательность $v_n$, порожденная методом \eqref{gradient method} с параметром
+	\begin{equation*}
+	0<\alpha_k<\frac{1}{\sqrt{2((|\nabla\Phi|+|\nabla g|L)^2+|g|^2)}},
+	\end{equation*}
+	 сходится монотонно по норме к одному из равновесных решений, т.е. $v_n\to v_*\in \mathbf{W}$ при $n\to \infty$.
+\end{theo}
+Обычно в литературе встречается термин \textit{экстраградиентный метод}, описывающий вычислительный процесс в случае $\mathbf{W}\ne \mathbb{R}^n$. 
+ 
+В работе \cite{8-2} также вводились понятия \textit{вырожденного, острого и квадратичного} равновесия, которые обобщают понятие обычной равновесной точки, и для них формулировались и доказались теоремы о сходимости методов.
+
+\textbf{Метод линеаризации}: Этот метод основан на идее \textit{аппроксимации допустимого множества изнутри} с помощью семейства пересекающихся шаров. Другими словами, мы делаем операцию проектирования на меняющееся, но простое линеаризованное множество.
+
+Рассмотрим следующий итерационный процесс, полагая, что начальное приближение $v_0$ - \textit{строго допустимая} (или точка Слейтера), т.е. $g_i(v_0)<0,i=1,2,..,m$. Вычислим последовательность $\{v_n\}$ с помощью метода
+\begin{equation}
+\label{linear}
+\begin{aligned}
+&\left\{\begin{array}{l}
+u_{k}=\operatorname{Pr}_{\Theta_k} \big[ v_k-\alpha_k\nabla_w\Phi(v_k,v_k)\big],\\
+v_{k+1}=\operatorname{Pr}_{\Theta_k} \big[ v_k-\alpha_k\nabla_w\Phi(u_k,u_k)\big],
+\end{array}\right.\\
+\Theta_k = \{w\in\mathbf{W_0}:&\frac{1}{2}|w-v|^2e+\alpha_k\big[ \nabla g(v_k)(w-v_k)+g(v_k)\big]\leqslant 0 \}
+\end{aligned}
+\end{equation}
+где $e=(1,...,1)\in\mathbb{R}^m$, $\alpha_k>0$ и $\nabla g(v)$ - матрица, состоящая из вектор-градиентов $g_i(v),i=1,2,...,m$.
+Сначала напишем неравенство Липшица:
+\begin{equation}
+\label{lip-1}
+g(w)-g(v)-\nabla g(v)(w-v)\leqslant \frac{L}{2}|w-v|^2,\quad \forall w\in\mathbf{W_0},\forall v\in\mathbf{W}.
+\end{equation}
+где $L$ - векторная константа с компонентами $L_i,i=1,2,...,m$, то есть каждая $i$-я компонента является константой Липшица для $i$-го функционального ограничения. Далее используем условие Липшица для оператора $\nabla_w\Phi$
+\begin{equation}
+\label{lip-2}
+|\nabla_w\Phi(v+h,v+h)-\nabla_w\Phi(v,v)|\leqslant L_0|h|,\forall v,v+h\in\mathbf{W_0}.
+\end{equation}
+Сформулируем теорему о сходимости метода внутренней линеаризации. Доказательство можно найти в \cite{7}.
+\begin{theo}
+	Пусть задача \eqref{intro-1} удовлетворяет условию регулярности Слейтера, пусть также функция этой задачи представлена в канонической форме $\Phi(v,w)=P(w)+K(v,w)$, где $K(v,w)$ - кососимметричная функция. Пусть также $\Phi(v,w)$ и $g(w)$ - функции, выпуклые и дифференцируемые по $w\in\mathbf{W_0}$ для любого $v\in\mathbf{W_0}$, градиенты их удовлетворяют условиям Липшица \eqref{lip-1}\eqref{lip-2} с константами $L_0$ и $L$ (последняя векторная константа), последовательность $\bar{p}_n\leqslant C,p_{n+1}\leqslant C$ ограничены\cite{7}, $\mathbf{W_0}\in \mathbb{R}^n$ - выпуклое, замкнутое множество; тогда последовательность $v_n$, порожденная методом \eqref{linear} с параметром
+	\begin{equation*}
+	0<\alpha_k<\min\{1/L_1,...,1/L_m,[2(\alpha L_0^2+\langle L,C\rangle )]^{-1} \}
+	\end{equation*}
+	монотонно по норме пространства сходится к решению задачи \eqref{intro-1}. При этом последовательность $v_n$ является строго допустимой\cite{7}.
+\end{theo}
+Если выполнено также \textit{условие квадратичного равновесия}\cite{8}, то гарантируется сходимость метода со скоростью геометрической прогрессии, то есть
+\begin{equation*}
+|v_{k+1}-v_*|^2\leqslant q(\alpha)^{k+1}|v_0-v_*|^2, k\to \infty, q\in(0,1), \alpha\text{ - параметр}.
+\end{equation*}
+
+\textbf{Проксимальный метод}: Этот метод обычно применяется в случае, когда равновесные задачи становятся \textit{негладкими}, то есть функция $\Phi(v,w)$ не всегда дифференцируема по $w$.
+
+Рассмотрим проксимальную итеративную схему, предпологая, что $v_0$ - начальное приближение из $\mathbf{W}$:
+\begin{equation}
+\label{approx}
+\left\{\begin{array}{l}
+u_k=\operatorname{Arg}\min\limits_{w\in\mathbf{W}}\big\{ \frac{1}{2}\|w-v_k\|^2+\alpha_k\Phi(v_k,w)\big\}\\
+v_{k+1}=\operatorname{Arg}\min\limits_{w\in\mathbf{W}}\big\{ \frac{1}{2}\|w-v_k\|^2+\alpha_k\Phi(u_k,w)\big\}\\
+\end{array}
+\right.
+\end{equation}
+
+Сформулируем теорему о сходимости \textit{явного} проксимального прогнозного метода, с доказательством можно ознакомиться в \cite{9}.
+\begin{theo}
+Пусть множество решений задачи \eqref{intro-1} не пусто и функция $\Phi(v,w)$ удовлетворяет условию кососимметричности, непрерывна по $v$ и выпукла по $w$ при каждом $v\in\mathbf{W},\mathbf{W}\in\mathbb{R}^n$ - выпуклое замкнутое множество. Кроме того, функции $\Phi(v,w)$ и $g(w)$ выпуклы по $w$ и удовлетворяют условиям Липшица. Тогда последовательность $v_n$, порожденная методом \eqref{approx} с параметром 
+\begin{equation*}
+0<\alpha_k < \big(\sqrt{2(|\Phi|^2+|g|^2)} \big)^{-1}
+\end{equation*}
+сходится монотонно по норме к одному из равновесных решений, т.е. $v_n\to v_*$ при $n\to \infty$.
+\end{theo}
+Сразу заметим, что если $\Phi(v,w)$ - дифференцируема по $w$, то метод становится экстраградиентным. 
+
+\textbf{Непрерывные варианты методов}: Рассмотрим непрерывные аналоги приведенных выше методов, представляющие собой генераторы целого семейства методов при использовании той или иной разностной схемы решения дифференциальных уравнений. Понятно, что их количество большое, поэтому здесь мы приведем лишь одну схему из возможных вариантов непрерывного экстраградиентного метода. 
+
+Формально, предлагается непрерывный экстраградиентный метод второго порядка с переменной метрикой:
+\begin{equation}
+\label{conti-extra}
+\left\{\begin{array}{l}
+v(0)=v_0,\dot{v}(0)=v_1\quad t\geqslant 0.\\
+u(t)=\operatorname{Pr}^{G(v(t))}_{\mathbf{W}}\big[ v(t)-\gamma(t)G^{-1}(v(t))\nabla_w\Phi(v(t),v(t))\big],\\
+\mu(t)G^{-1}(v(t))\ddot{v}(t)+\beta(t)\dot{v}(t)+v(t)=\\
+=\operatorname{Pr}^{G(v(t))}_{\mathbf{W}}\big[v(t)-\gamma(t)G^{-1}(v(t))\nabla_w\Phi(u(t),u(t)) \big],
+\end{array}
+\right.
+\end{equation}
+где $v_0$ - любая фиксированнная точка из $\mathbb{E}^n$, $\nabla_w\Phi(v,w)$ - градиент функции $\Phi(v,w)$ по переменной $w$, $\gamma(t),\mu(t),\beta(t)$ - параметры метода, $G(v)$ для каждого $v$ - заданная симметричная положительно определенная матрица, $\operatorname{Pr}^{G(v(t))}_{\mathbf{W}}[z]$ - так называемая \textit{$G$-проекция} точки $z$ на множество $\mathbf{W}$, то есть точка $\operatorname{Pr}^{G(v(t))}_{\mathbf{W}}[z]$ - решение задачи минимизации
+\begin{equation*}
+f(y)=\frac{1}{2}\langle G(v(t))(y-z),y-z \rangle \to\inf_{y\in\mathbf{W}}
+\end{equation*}
+Формулируем теорему о сходимости для метода \eqref{conti-extra}.
+\begin{theo} Пусть выполнены следующие условия:\\
+\textbf{1)} $\mathbf{W} \subseteq \mathbb{E}^{n}$ - выпуклое замкнутое множество, множество решений задачи \eqref{intro-1} $\mathbf{W_{*}}$ неnycтo; \\
+\textbf{2)} Функция $\Phi(v,w)$ выпукла, непрерывно дифференцируема по $w$ при любом $v $ из $ \mathbb{E}^{n} $; удовлетворяет условию кососимметричности на $\mathbf{W}$:
+\begin{equation*}
+\Phi(v, v)-\Phi(v, w)-\Phi(w, v)+\Phi(w, w) \geqslant 0 \quad \forall v, w \in \mathbf{W}
+\end{equation*}
+сужение ее частного градиента по второй перемениой на диагональ множества $ \mathbb{E}^{n} \times \mathbb{E}^{n}$ удовлетворяет условия Липшица
+\begin{equation*}
+\left\|\nabla_{w} \Phi(u, u)-\nabla_{w} \Phi(v, v)\right\| \leqslant L_{w}\|u-v\|, \quad \forall u, v \in \mathbb{E}^{n}
+\end{equation*}
+\textbf{3)} $G(v)$ - симметричная положительно определенная матрица при любом $v$ из $\mathbb{E}^n$; существуют сильно выпуклая дважды дифференцируемая функция $\Psi(v)$ и положительные константы $m, M$, где $m \leqslant M$, такие что
+\begin{equation*}
+G(v) \equiv \Psi^{\prime \prime}(v) ; \quad m\|w\|^{2} \leqslant\langle G(v) w, w\rangle \leqslant M\|w\|^{2} \quad \forall v, w \in \mathbb{E}^{n}
+\end{equation*}
+\textbf{4)} Параметры $\mu(t), \beta(t), \gamma(t) $ удовлетворяют следующим условиям:
+\begin{equation*}
+\begin{aligned}
+&\gamma(t)>0 ; \lim _{t \rightarrow \infty} \gamma(t)=\gamma_{0} ; 0<\gamma_{0}<\min \left\{\frac{m}{6 L_{w}}, \frac{m^{2}}{4 M L_{w}}\right\};\\
+&\mu(t) \in C^{2}[0 ;+\infty) ; \beta(t) \in C^{1}[0 ;+\infty) ; \mu(t) \geqslant \mu_{0}>0 ; m \beta^{2}(t)>4 \mu(t);\\
+&\mu^{\prime \prime}(t) \geqslant 0, \mu^{\prime}(t) \leqslant 0, \beta^{\prime}(t) \leqslant 0, \lim _{t \rightarrow \infty} \beta(t)=\beta_{\infty}>0, \lim _{t \rightarrow \infty}\mu^{\prime}(t)=\mu_{\infty}^{\prime} 
+\end{aligned}
+\end{equation*}
+Тогда существует такая точка $v^{\prime}$ из множества решений $\mathbf{W_{*}}$ задачи \eqref{intro-1}, что 
+\begin{equation*}
+\lim\limits_{t\to\infty}\|v(t)-v^{\prime}\|=0;\lim\limits_{t\to\infty}\|\dot{v}(t)\|=0;\lim\limits_{t\to\infty}\|\ddot{v}(t)\|=0;
+\end{equation*}
+
+\end{theo}
+
+О доказательстве этой теоремы, о непрерывных методах других итеративных методов, а также о их регуляризованных вариантах методов можно узнать в диссертации \cite{10}. 
+
+\textbf{Метод стрельбы}: Один из новых разработанных методов к решению равновесных задач является так называемый \textit{метод стрельбы}. Его вычислительный процесс выглядит следующим образом:
+\begin{equation}
+\label{shooting}
+\left\{\begin{array}{l}
+v_0\in \mathbf{W}\text{ известно},\\
+w_k = \operatorname{Pr}_{\mathbf{W}}(v_k-\alpha_k\nabla_w\Phi(v_k,v_k)),\\
+C_k = \{z\in \mathbf{W}:\|w_k-z\|\leqslant\|v_k-z\|\},\\
+Q_k=\{z\in\mathbf{W}:\langle z-v_k,v_k,v_0\rangle\geqslant 0 \},\\
+v_{k+1} = \operatorname{Pr}_{C_k\cap Q_k}(v_0),\quad k=0,1,2,...
+\end{array}
+\right.
+\end{equation}
+
+Название ``метод стрельбы'' взято как естественная интерпретация приведенных формул – в самом деле, проектируется одна и та же точка на \textit{постоянно меняющееся} множество, что вполне логично трактовать как стрельбу по движущейся мишени.
+
+Достаточные условия, гарантирующие сходимость метода \eqref{shooting} к множеству решений задачи \eqref{intro-1}, описывает
+следующая
+\begin{theo}
+Пусть $\mathbf{W}$ - непустое замкнутое выпуклое множество гильбертова пространства $\mathbb{H}$, функционал $\Phi(v, w)$ выпуклый и непрерывно дифференцируемый по Фреше по переменной $w$ на $\mathbf{W}$ при любом $v\in\mathbf{W}$, сужение его частного градиента $\nabla_w\Phi(v, v)$ удовлетворяет условию обратимой строгой монотонности с коэффициентом $\alpha$:
+\begin{equation*}
+\langle \nabla_w\Phi(v,v)-\nabla_w\Phi(w,w),v-w\rangle\geqslant \alpha\|\nabla_w\Phi(v,v)-\nabla_w\Phi(w,w)\|^2,\forall v,w\in\mathbf{W}.
+\end{equation*}
+Пусть множество $\mathbf{W_{*}}$ решений задачи \eqref{intro-1} непусто, а шаг метода \eqref{shooting} удовлетворяет условию
+$\alpha_k\in[\varepsilon, 2\alpha)$, где $0 < \varepsilon< 2\alpha$. Тогда все слабые предельные точки генерируемой им последовательности $v_k$ принадлежат $\mathbf{W_{*}}$. 
+
+Если, кроме того, множество $\operatorname{Pr}_{\mathbf{W_{*}}}(v_0)$ непусто, то последовательность $v_k$ сходится к нему по норме $\mathbb{H}$.
+\end{theo}
+Подробные доказательство и обсуждение можно найти в \cite{10-2}.
+
+Итак, в этом разделе рассмотрены различные методы решения исходной задачи \eqref{intro-1}, которые применяются в разных случаях. В следующем разделе обсудим методы, применяемые в случае присутствия возмущений данных функции $\Phi(v,w)$ и множества $\mathbf{W}$. 
+\subsection{Методы регуляризации}
+Прежде всего, выделяем два основных направления учета ограничений множества $\mathbf{W}$: методы, основанные на \textit{расширении множества}, и методы, основанные на \textit{сочетании с штрафной функцией}. 
+
+\emph{Сочетание с штрафной функцией}:
+Вместо сложного множества $\mathbf{W}$ работаем на более простом множестве $\mathbf{W_0}$ (возможно $\mathbf{W_0}=\mathbb{R}^n$), добавив штрафное слагаемое $AP_{\delta}(w)$ в тихоновскую функцию. Эту идею можем увидеть в \cite{5}, стр. 323.
+
+\emph{Расширение множества $\mathbf{W}$}:
+Эта идея снятия ограничения заключается в том, что мы ``расширяем'' множество $\mathbf{W}$ на $\mathbf{W}(\delta)$:
+\begin{equation*}
+\mathbf{W}(\delta)=\{w\in \mathbf{W_0}:g_{i\delta}^+(w)\leqslant\Theta[1+\Omega(w)],i=\overline{1,s}\}.
+\end{equation*}
+При $\forall \Theta\geqslant\delta>0$ имеем $\mathbf{W}\subset \mathbf{W}(\delta).$
+
+Предположим, что множество $\mathbf{W}$ теперь задается ограничениями типа \textit{неравенств и равенств}:
+\begin{equation*}
+\mathbf{W}=\{w\in\mathbf{W_0} :g_i(w)\leqslant 0,i=1,...,m;g_i(w)=0,i=m+1,...,s\}.
+\end{equation*}
+где $\Omega(w)$ - какая-либо функция со следующими свойствами: $\Omega(w)\geqslant 0,\forall w\in\mathbf{W_0}$ и множество $\{w\in\mathbf{W_0}:\Omega(w)\leqslant c \}$ ограничено при всех $c$, при которых это множество не пусто. Функцию $\Omega(w)$
+с указанными свойствами будем называть \textit{стабилизатором} задачи \eqref{intro-1}. Предположим, что приближения $\Phi_{\delta}(v, w), g_{i\delta}(w), w \in\mathbf{W_0}$, функций $\Phi( v, w), g_i(w)$ таковы, что
+\begin{equation}
+\label{noiiise}
+\begin{aligned}
+&|\Phi_{\delta}(v,w)-\Phi(v,w)|\leqslant \delta(1+\Omega(w)),\forall v\in \mathbf{W_0},w\in\mathbf{W_0},\\
+&|g_{i\delta}(w)-g_{i}(w)|\leqslant \delta(1+\Omega(w)),\forall v\in \mathbf{W_0},i=1,...,s,
+\end{aligned}
+\end{equation}
+где $\delta > 0$ - мера погрешности.
+
+Далее будем предполагать, что для некоторой точки $v^* \in\mathbf{W^{*}}$ существуют постоянные $c_1\geqslant 0,...,c_s\geqslant 0$ такие, что
+\begin{equation}
+\label{key-condition}
+\Phi(v_*,v_*)\leqslant \Phi(v_*,w)+\sum_{i=1}^{s}c_ig_i^+(w),\forall w\in\mathbf{W_0}.
+\end{equation}
+где $g_i^+(w)=\max\{g_i(w),0\},i=1,....,m$, и $g_i^+(w)=|g_i(w)|,i=m+1,....,s$. В \cite{centralbib} приведены классы задач, удовлетворяющие этому условию.
+
+В ниже приведенных методах используется \textit{идея расширения множества}. Похожие схемы можно увидеть и в случае, когда используется сочетание с штрафной функцией\cite{centralbib}\cite{12}\cite{13}. Поэтому здесь мы ограничимся рассмотрением расширения множества.
+
+\textbf{Метод стабилизации:} Начнем рассмотрение со схемы метода стабилизации. Введем функцию Тихонова: 
+\begin{equation}
+t_{\delta} (v,w)=\Phi_{\delta}(v,w)+\alpha \Omega(w),\quad w\in \mathbf{W_0},\alpha>0.
+\end{equation}
+Будем искать точку, удовлетворяющую условиям
+\begin{equation}
+\label{stab-method}
+v_{\delta}\in \mathbf{W_{\delta}},\quad t_{\delta}(v_\delta,v_\delta)\leqslant \inf\limits_{w\in W(\delta)}t_{\delta}(v_{\delta},w)+\varepsilon,\quad \varepsilon>0.
+\end{equation}
+Доказана теорема\cite{11}, устанавливающая сходимость метода при определенном выборе параметров.
+\begin{theo}
+\label{theo-stab}
+Пусть выполнены следующие условия:\\
+\textbf{1)} $\mathbf{W_0}$ - замкнутое ограниченное множество, функции $g_i(w),i=1,...,m,|g_i(w)|,i=m+1,\ldots,s,\Phi(w,w)$ полунепрерывны снизу на $\mathbf{W_0}$; функция $\Phi(v,w)$ полунепрерывна сверху по $v$ на $\mathbf{W_0}$ при любом фиксированном $w\in\mathbf{W_0}$; множество $\mathbf{W_*}$ решений задачи \eqref{intro-1} непусто; для некоторой точки $v_*\in\mathbf{W_*}$ выполнено неравенство \eqref{key-condition}; функция $\Phi(v,w)$ кососимметрична на $\mathbf{W_0}$,\\
+\textbf{2)} $\Omega(w)$ - стаблизатор задачи \eqref{intro-1},\\
+\textbf{3)} приближения $\Phi_{\delta}(v,w),g_{i\delta}(w)$ функций $\Phi(v,w),P(w)$ удовлетворяют условиям \eqref{noiiise};\\
+\textbf{4)} параметры $\alpha=\alpha(\delta),\Theta=\Theta(\delta),\varepsilon=\varepsilon(\delta),\delta>0$ метода \eqref{stab-method} таковы, что
+\begin{equation}
+\begin{aligned}
+&\alpha(\delta)>0,\Theta(\delta)\geqslant \delta>0,\varepsilon(\delta)>0,\lim_{\delta\rightarrow 0} [\alpha(\delta+\Theta(\delta)+\varepsilon(\delta))]=0,\\
+&\sup_{\delta>0}\frac{\delta+2|c|_1\Theta(\delta)}{\alpha(\delta)}<1,[\delta+\alpha(\delta)][1+\Omega(v_*)]\leqslant \varepsilon(\delta), \sup_{\delta>0}\frac{\varepsilon(\delta)}{\alpha(\delta)}<+\infty.
+\end{aligned}
+\end{equation}
+Тогда множество $\mathbf{W_{*\delta}}$ точек, удовлетворяющих \eqref{stab-method}, непусто, при всех $\delta>0$, и 
+\begin{equation}
+\label{conv}
+\lim_{\delta\rightarrow 0}\rho(v_{\delta},\mathbf{W_*})=0,\quad\lim_{\delta\rightarrow 0} \rho(\Phi(v_{\delta},v_{\delta}),\Phi_*)=0,
+\end{equation}
+где $\Phi_*$ - множество значений функций $\Phi(v,v)$, когда $v$ пробегает множество $\mathbf{W_*}$, причем сходимость в \eqref{conv} равномерная относительно выбора $\Phi_{\delta}(v,w),P_{\delta}(w)$ из \eqref{noiiise} и точки $v_{\delta}$ из $\mathbf{W_{*\delta}}$.
+\end{theo}
+
+\textbf{Метод невязки:} В этом методе предполагается введение множества
+\begin{equation*}
+V(\delta)=\{v\in W(\delta):\Phi_{\delta}(v,v)\leqslant \inf\limits_{w\in W(\delta)}[\Phi_{\delta}(v,w)+\Theta M_1\Omega(w)]+\sigma,\sigma>0\}.
+\end{equation*}
+где $M_1$ - достаточно большая константа. Будем искать точку $v=v_{\delta}$ из условий 
+\begin{equation}
+\label{neva-method}
+v_{\delta}\in V(\delta),\Omega(v_{\delta})\leqslant\inf\limits_{v\in V(\delta)}\Omega(w)+\mu,\mu>0.
+\end{equation} Формально описан метод невязки. Приведем теорему для установления сходимости метода.
+\begin{theo}
+Пусть выполнены условия \textbf{1) - 3)} теоремы \ref{theo-stab} и, кроме того, параметры $\Theta=\Theta(\delta),\sigma=\sigma(\delta)$ метода \eqref{neva-method} таковы, что
+\begin{equation*}
+\Theta(\delta)\geqslant \delta >0,\sigma(\delta)>0,\mu(\delta)<0,\lim\limits_{\delta\to 0}[\Theta(\delta)+\sigma(\delta)]=0,2M_1\Theta(\delta)\leqslant\sigma(\delta),\sup\limits_{\delta>0}\mu(\delta)<\infty.
+\end{equation*}
+
+Тогда множество $V(\delta) \ne\varnothing,\forall \delta > 0$, множество $\mathbf{W_{*\delta}}$ точек $v_{\delta}$, удовлетворяющих условиям \eqref{neva-method}, непусто при всех $\delta>0 $ и для метода \eqref{neva-method} также справедливы неравенства \eqref{conv}. Если дополнительно известно, что функция $\Omega(w)$ полунепрерывна снизу на $\mathbf{W_0}$ и $\lim\limits_{\delta\to\infty}\mu(\delta) = 0$, то
+\begin{equation}
+\label{conv-2}
+\lim_{\delta\rightarrow 0}\rho(v_{\delta},\mathbf{W_{**}})=0,\quad\lim_{\delta\rightarrow 0} \rho(\Phi(v_{\delta},v_{\delta}),\Phi_{**})=0,
+\end{equation}
+где $\mathbf{W_{**}}=\{v\in \mathbf{W_*} : \Omega(v)\leqslant \Omega(v_*)\},\Phi_{**}=\{\Phi:\Phi=\Phi(v,v),v\in\mathbf{W_{**}} \}$. Сходимость в \eqref{conv}\eqref{conv-2} равномерная относительно выбора $\Phi_{\delta}(v,w),g_{i\delta}(w)$ из \eqref{noiiise} и точки $v_{\delta}$ из $\mathbf{W_{*\delta}}$.
+\end{theo}
+
+\textbf{Метод квазирешений:} Предполагается, что $\Omega(v_*)\leqslant r$, где $r$ - число, $v_*$ - какая-то точка из $\mathbf{W_*}$, для которой выполняется условие \eqref{key-condition}. Введем множество
+\begin{equation*}
+\mathbf{W}(\delta,r)=\{ v\in\mathbf{W}(\delta):\Omega(v)\leqslant r \}.
+\end{equation*}
+Понятно, что $v_*\in \mathbf{W}(\delta,r)$, так что $\mathbf{W}(\delta,r)\ne \varnothing,\forall \delta >0$. Ищется точка
+\begin{equation}
+\label{kvasi-method}
+ v_{\delta}: v_{\delta}\in W(\delta,r),\Phi_{\delta}(v_{\delta},v_{\delta})\leqslant\inf\limits_{w\in W(\delta)}[\Phi_{\delta}(v_{\delta},w)+\Theta M_2\Omega(w)]+\xi,\xi>0.
+\end{equation}
+Здесь $M_2$ - const, $W(\delta,r)=\{v\in W(\delta):\Omega(v)\leqslant r \}$. Приведем теорему о сходимости.
+\begin{theo}
+Пусть выполнены условия \textbf{1) - 3)} теоремы \ref{theo-stab}, функция $\Omega(w)$ полунепрерывна снизу на $\mathbf{W_0}$, выполнено $\Omega(v_*)\leqslant r$ и параметры $\Theta=\Theta(\delta),\xi=\xi(\delta)$ метода \eqref{kvasi-method} таковы, что
+\begin{equation*}
+\Theta(\delta)\geqslant \delta >0,\xi(\delta)>0,\lim\limits_{\delta\to 0}[\Theta(\delta)+\xi(\delta)]=0,2M_2\Theta(1+r)\leqslant\xi(\delta),
+\end{equation*}
+Тогда множество $\mathbf{W_{*\delta}}$ точек $v_{\delta}$, удовлетворяющих условиям \eqref{kvasi-method}, непусто при всех $\delta>0 $ и 
+\begin{equation}
+\label{conv-3}
+\lim_{\delta\rightarrow 0}\rho(v_{\delta},\mathbf{W_{*r}})=0,\quad\lim_{\delta\rightarrow 0} \rho(\Phi(v_{\delta},v_{\delta}),\Phi_{*r})=0,
+\end{equation}
+где $\mathbf{W_{*r}}=\{v\in \mathbf{W_*} : \Omega(v)\leqslant r\},\Phi_{*r}=\{\Phi:\Phi=\Phi(v,v),v\in\mathbf{W_{*r}} \}$. Сходимость в \eqref{conv-3} равномерная относительно выбора $\Phi_{\delta}(v,w),g_{i\delta}(w)$ из \eqref{noiiise} и точки $v_{\delta}$ из $\mathbf{W_{*\delta}}$.
+\end{theo}
+
+Итак, формально описаны методы регуляризации. В работах(например, \cite{centralbib}\cite{centralbib-2}\cite{15}) широко используется стабилизатор вида $\alpha_k\langle v,w\rangle$. В следующих главах будет обсуждаться вопрос о том, что будет получаться, если используется новый стабилизатор задачи, то есть стабилизатор вида $-\alpha_k\|v-w\|^2$, который учитывает характер равновесной задачи и сам обладает хорошим свойством, пригодным для решения прикладных равновесных задач.
+\clearpage
