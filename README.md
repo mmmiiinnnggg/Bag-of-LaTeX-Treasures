@@ -21,3 +21,18 @@ LaTeX-documented knowledge summaries of main math courses in bachelor, including
     - [Модели извлечения знаний](https://github.com/mmmiiinnnggg/Bag-of-LaTeX-Treasures/blob/master/PDF/4-%D0%BA%D1%83%D1%80%D1%81-%D1%81%D0%BF%D0%B5%D1%86%D0%BA%D1%83%D1%80%D1%81-%D0%B8%D0%B7%D0%B2%D0%BB%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B9.pdf)
     - [Математические модели в физике](https://github.com/mmmiiinnnggg/Bag-of-LaTeX-Treasures/blob/master/PDF/4-%D0%BA%D1%83%D1%80%D1%81-%D0%BC%D0%B0%D1%82%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8%20%D0%B2%20%D1%84%D0%B8%D0%B7%D0%B8%D0%BA%D0%B5-%D0%BD%D0%B5%D0%BA%D0%B8%D0%B9%20%D0%BE%D0%B1%D0%B7%D0%BE%D1%80.pdf)
 
+**Notions:**  
+- How to plug in `Python` code in the latex:
+  1. Download package [`pythonhighlight`](https://github.com/olivierverdier/python-latex-highlighting) (pythonhighlight.sty), put it in the folder which contains `.tex`.
+  2. In the `.tex` file: before `\usepackage{document}` write
+     ```
+     \usepackage{graphicx}  
+     \usepackage{pythonhighlight}
+     ```
+  3. plug in python code in the following way:
+     ```
+     \begin{python}  
+     print("Hello world!")  
+     \end{python}  
+     ```
+ - How to plug in `C/C++` and other language code: use package `listings`
